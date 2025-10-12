@@ -1,0 +1,52 @@
+﻿@model List<DriveHub.Models.EmailRecord>
+
+@{
+    ViewData["Title"] = "Email Log";
+}
+
+<h1>Email Log</h1>
+<p class="lead">All emails sent by the system</p>
+
+@if (Model.Any())
+{
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Sent To</th>
+                        <th>Subject</th>
+                        <th>Type</th>
+                        <th>Content</th>
+                        <th>Sent At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var email in Model)
+                {
+                            <tr>
+                                <td>@email.ToEmail</td>
+                                <td>@email.Subject</td>
+                                <td>
+                                    <span class="badge @(email.Type == "Receipt" ? "bg-success" : "bg-warning")">
+                                @email.Type
+                                    </span>
+                                </td>
+                                <td style="max-width: 300px;">
+                                    <small>@email.Content</small>
+                                </td>
+                                <td>@email.SentAt.ToString("dd MMM yyyy HH:mm")</td>
+                            </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+}
+else
+{
+        <div class="alert alert-info">
+            <h4>No Emails Sent</h4>
+            <p>No emails have been sent by the system yet.</p>
+        </div>
+}
+
+<a href="@Url.Action("Index")" class="btn btn-secondary">Back to Dashboard</a>

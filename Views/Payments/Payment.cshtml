@@ -1,0 +1,102 @@
+﻿@model DriveHub.ViewModels.PaymentViewModel
+
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<h1>Complete Your Payment</h1>
+
+@if (TempData["PaymentError"] != null)
+{
+        <div class="alert alert-danger">
+        @TempData["PaymentError"]
+        </div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5>Package: @Model.PackageType</h5>
+                <h6>Amount Due: R@(Model.Amount)</h6>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/Payments/ProcessPayment" id="paymentForm">
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="PackageId" value="@Model.PackageId" />
+                    <input type="hidden" name="PackageType" value="@Model.PackageType" />
+                    <input type="hidden" name="Amount" value="@Model.Amount" />
+
+                    <div class="form-group mb-3">
+                        <label>Cardholder Name</label>
+                        <input type="text" name="CardHolderName" class="form-control" required 
+                               value="Test User" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label>Card Number (16 digits)</label>
+                        <input type="text" name="CardNumber" class="form-control" required 
+                               pattern="[0-9]{16}" maxlength="16" minlength="16"
+                               value="4111111111111111" />
+                        <small class="form-text text-muted">Must be exactly 16 digits</small>
+                        @Html.ValidationMessage("CardNumber", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label>Expiry Month</label>
+                                <input type="number" name="ExpiryMonth" class="form-control" required 
+                                       min="1" max="12" value="12" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label>Expiry Year</label>
+                                <input type="number" name="ExpiryYear" class="form-control" required 
+                                       min="2024" max="2030" value="2025" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label>CVV (3 digits)</label>
+                        <input type="text" name="CVV" class="form-control" required 
+                               pattern="[0-9]{3}" maxlength="3" minlength="3"
+                               value="123" />
+                        <small class="form-text text-muted">Must be exactly 3 digits</small>
+                        @Html.ValidationMessage("CVV", new { @class = "text-danger" })
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg w-100">
+                        💳 PAY R@(Model.Amount) NOW
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('paymentForm').addEventListener('submit', function(e) {
+        const cardNumber = document.querySelector('input[name="CardNumber"]').value;
+        const cvv = document.querySelector('input[name="CVV"]').value;
+
+        // Validate card number
+        if (cardNumber.length !== 16 || !/^\d+$/.test(cardNumber)) {
+            e.preventDefault();
+            alert('Card number must be exactly 16 digits (numbers only)');
+            return false;
+        }
+
+        // Validate CVV
+        if (cvv.length !== 3 || !/^\d+$/.test(cvv)) {
+            e.preventDefault();
+            alert('CVV must be exactly 3 digits (numbers only)');
+            return false;
+        }
+
+        return true;
+    });
+</script>

@@ -1,0 +1,236 @@
+﻿@{
+    ViewData["Title"] = "DriveHub - Your Journey to Confident Driving";
+}
+
+<!-- Hero Section -->
+<section class="hero-section" style="position: relative; min-height: 80vh; display: flex; align-items: center; overflow: hidden;">
+    <!-- Background Image -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+        <img src="/images/hero-image.jpg" 
+             alt="DriveHub Hero" 
+             style="width: 100%; height: 100%; object-fit: cover;"
+             onerror="this.style.display='none'">
+    </div>
+
+    <!-- Dark Overlay for better text readability -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4);"></div>
+
+    <!-- Content (buttons and text) -->
+    <div class="container text-white text-center" style="position: relative; z-index: 2;">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-4">Welcome to DriveHub</h1>
+                <p class="lead mb-5 fs-4">
+                    Your journey to confident driving starts here. Book lessons, track progress, and master the road with professional instructors.
+                </p>
+
+                <!-- Centered Auth Buttons -->
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="/Account/Register" class="btn btn-primary btn-lg px-4 py-2 fw-bold" style="background-color: #0d6efd; border-color: #0d6efd;">
+                        🚗 Get Started
+                    </a>
+                    <a href="/Account/Login" class="btn btn-outline-light btn-lg px-4 py-2 fw-bold">
+                        🔑 Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Features Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold text-primary">Why Choose DriveHub?</h2>
+                <p class="lead">Everything you need to become a confident driver</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3" style="font-size: 3rem;">📅</div>
+                        <h5 class="fw-bold">Easy Scheduling</h5>
+                        <p class="text-muted">Book and manage your driving lessons with our simple, intuitive scheduling system.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3" style="font-size: 3rem;">👨‍🏫</div>
+                        <h5 class="fw-bold">Expert Instructors</h5>
+                        <p class="text-muted">Learn from certified, experienced driving instructors who care about your success.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3" style="font-size: 3rem;">📊</div>
+                        <h5 class="fw-bold">Progress Tracking</h5>
+                        <p class="text-muted">Monitor your learning journey with detailed progress reports and feedback.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold text-primary">How It Works</h2>
+            </div>
+        </div>
+
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div class="step-number mb-3" style="width: 60px; height: 60px; background: #0d6efd; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto;">1</div>
+                <h5>Register</h5>
+                <p class="text-muted">Create your account in seconds</p>
+            </div>
+
+            <div class="col-md-3">
+                <div class="step-number mb-3" style="width: 60px; height: 60px; background: #0d6efd; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto;">2</div>
+                <h5>Claim Dashboard</h5>
+                <p class="text-muted">Access your personalized student dashboard</p>
+            </div>
+
+            <div class="col-md-3">
+                <div class="step-number mb-3" style="width: 60px; height: 60px; background: #0d6efd; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto;">3</div>
+                <h5>Choose Package</h5>
+                <p class="text-muted">Select the learning package that fits your goals</p>
+            </div>
+
+            <div class="col-md-3">
+                <div class="step-number mb-3" style="width: 60px; height: 60px; background: #0d6efd; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; margin: 0 auto;">4</div>
+                <h5>Start Learning</h5>
+                <p class="text-muted">Begin your journey to becoming a confident driver</p>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Packages Preview -->
+<section class="py-5 bg-primary text-white">
+    <div class="container">
+        <div class="row text-center mb-4">
+            <div class="col">
+                <h2 class="fw-bold">Learning Packages</h2>
+                <p class="lead">Choose the perfect package for your driving journey</p>
+            </div>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <!-- Learners Package -->
+            <div class="col-md-4">
+                <div class="card bg-white text-dark h-100">
+                    <div class="card-body text-center p-4">
+                        <h5 class="fw-bold text-primary">🚗 Learners Package</h5>
+                        <p class="my-3">Perfect for beginners starting their driving journey</p>
+                        <ul class="list-unstyled text-start">
+                            <li>✓ Professional Driving Lessons</li>
+                            <li>✓ Certified Instructors</li>
+                            <li>✓ Progress Tracking</li>
+                            <li>✓ Road Safety Education</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drivers Package -->
+            <div class="col-md-4">
+                <div class="card bg-white text-dark h-100">
+                    <div class="card-body text-center p-4">
+                        <h5 class="fw-bold text-primary">🏆 Drivers Package</h5>
+                        <p class="my-3">Comprehensive training for driver's license (Code 8 & Code 10)</p>
+                        <ul class="list-unstyled text-start">
+                            <li>✓ Advanced Driving Techniques</li>
+                            <li>✓ License Test Preparation</li>
+                            <li>✓ Code 8 & Code 10 Training</li>
+                            <li>✓ Vehicle Handling Skills</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Full Package -->
+            <div class="col-md-4">
+                <div class="card bg-white text-dark h-100">
+                    <div class="card-body text-center p-4">
+                        <h5 class="fw-bold text-primary">🎯 Full Package</h5>
+                        <p class="my-3">Complete solution from learners to driver's license</p>
+                        <ul class="list-unstyled text-start">
+                            <li>✓ Learners + Drivers Package</li>
+                            <li>✓ Comprehensive Training</li>
+                            <li>✓ Test Booking Assistance</li>
+                            <li>✓ Road Test Support</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA -->
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <h3 class="fw-bold mb-3">Ready to Start Your Driving Journey?</h3>
+        <p class="lead mb-4">Join thousands of successful drivers who started with DriveHub</p>
+        <a href="/Account/Register" class="btn btn-primary btn-lg px-5 py-3 fw-bold" style="background-color: #0d6efd; border-color: #0d6efd;">
+            🚗 Start Learning Today
+        </a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 text-center text-md-start">
+                <p class="mb-0">&copy; 2024 DriveHub. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <a href="#" class="text-white text-decoration-none me-3">Privacy Policy</a>
+                <a href="#" class="text-white text-decoration-none">Terms of Service</a>
+                <p class="mt-2 mb-0 small">Powered by OpenSquad</p>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12 text-center">
+                <p class="small text-muted mb-0">
+                    Learn About Building Web Apps with ASP.NET Core
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .hero-section {
+        background-attachment: fixed;
+    }
+
+    .feature-icon {
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover .feature-icon {
+        transform: scale(1.1);
+    }
+
+    .step-number {
+        transition: transform 0.3s ease;
+    }
+
+    .step-number:hover {
+        transform: scale(1.1);
+    }
+</style>

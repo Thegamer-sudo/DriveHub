@@ -1,0 +1,237 @@
+﻿@{
+    ViewData["Title"] = "Instructor Dashboard";
+}
+
+<h1>Welcome, @ViewBag.InstructorName! 👨‍🏫</h1>
+<p class="lead">Your Driving Instructor Management Dashboard</p>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">My Students</h5>
+                <h2>@ViewBag.TotalStudents</h2>
+                <small>Students assigned to you</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Active Packages</h5>
+                <h2>@ViewBag.TotalPackages</h2>
+                <small>Packages purchased</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Quick Actions</h5>
+                <a href="@Url.Action("MyStudents")" class="btn btn-light btn-sm">Manage Students</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Message Students Section -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>📧 Message Students</h5>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#messageModal">
+                    ✉️ Send Message to Students
+                </button>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-0">Send schedule updates, lesson reminders, or important notices to your assigned students.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>My Assigned Students</h5>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.AssignedStudents != null && ViewBag.AssignedStudents.Count > 0)
+                {
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Student Name</th>
+                                            <th>Contact</th>
+                                            <th>Package</th>
+                                            <th>Payment Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                @foreach (dynamic student in ViewBag.AssignedStudents)
+                                {
+                                    bool hasPayment = false;
+                                    bool hasPackages = false;
+
+                                    // Safely check if student has receipts and packages
+                                    if (student.Receipts != null)
+                                    {
+                                        hasPayment = ((IEnumerable<object>)student.Receipts).Any();
+                                    }
+                                    if (student.Packages != null)
+                                    {
+                                        hasPackages = ((IEnumerable<object>)student.Packages).Any();
+                                    }
+                                                    <tr>
+                                                        <td>
+                                                            <strong>@student.Student.FullName</strong>
+                                                        </td>
+                                                        <td>
+                                            @student.Student.Email<br>
+                                                            <small>@student.Student.PhoneNumber</small>
+                                                        </td>
+                                                        <td>
+                                            @if (hasPackages)
+                                            {
+                                                foreach (dynamic package in student.Packages)
+                                                {
+                                                                                    <span class="badge bg-primary">@package.Type</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                                        <span class="badge bg-secondary">No Package</span>
+                                            }
+                                                        </td>
+                                                        <td>
+                                            @if (hasPayment)
+                                            {
+                                                                        <span class="badge bg-success">Paid</span>
+                                            }
+                                            else
+                                            {
+                                                                        <span class="badge bg-warning">Pending</span>
+                                            }
+                                                        </td>
+                                                        <td>
+                                            @if (hasPackages)
+                                            {
+                                                                        <a href="@Url.Action("StudentDetails", new { studentId = student.Student.Id })" 
+                                                                           class="btn btn-primary btn-sm">Manage Lessons</a>
+                                            }
+                                            else
+                                            {
+                                                                        <span class="text-muted">No package selected</span>
+                                            }
+                                                        </td>
+                                                    </tr>
+                                }
+                                    </tbody>
+                                </table>
+                            </div>
+                }
+                else
+                {
+                            <div class="alert alert-info">
+                                <h5>No Students Assigned</h5>
+                                <p>You don't have any students assigned to you yet. Students will appear here once they register and are assigned to you.</p>
+                            </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="@Url.Action("MyStudents")" class="btn btn-primary">Manage All Students</a>
+                <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Message Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="messageModalLabel">✉️ Send Message to Students</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="SendMessageToStudents" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Select Students:</strong></label>
+                        @if (ViewBag.AssignedStudents != null && ViewBag.AssignedStudents.Count > 0)
+                        {
+                                <div class="student-checkboxes" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                                @foreach (dynamic student in ViewBag.AssignedStudents)
+                                {
+                                            <div class="form-check">
+                                                <input class="form-check-input student-checkbox" type="checkbox" 
+                                                       name="selectedStudentIds" value="@student.Student.Id" id="student-@student.Student.Id" checked>
+                                                <label class="form-check-label" for="student-@student.Student.Id">
+                                            @student.Student.FullName (@student.Student.Email)
+                                                </label>
+                                            </div>
+                                }
+                                </div>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="selectAllStudents()">Select All</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="deselectAllStudents()">Deselect All</button>
+                                </div>
+                        }
+                        else
+                        {
+                                <p class="text-muted">No students assigned to message.</p>
+                        }
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="messageSubject" class="form-label"><strong>Subject:</strong></label>
+                        <input type="text" class="form-control" id="messageSubject" name="messageSubject" 
+                               placeholder="e.g., Lesson Schedule Update, Important Notice..." required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="messageContent" class="form-label"><strong>Message:</strong></label>
+                        <textarea class="form-control" id="messageContent" name="messageContent" rows="6" 
+                                  placeholder="Type your message to students here. This will be sent to their email addresses..." required></textarea>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <small>💡 <strong>Tip:</strong> Use this to inform students about lesson schedules, cancellations, or important updates.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Send Messages</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function selectAllStudents() {
+    document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+        checkbox.checked = true;
+    });
+}
+
+function deselectAllStudents() {
+    document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+}
+</script>

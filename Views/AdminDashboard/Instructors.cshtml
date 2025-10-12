@@ -1,0 +1,82 @@
+﻿@using DriveHub.Models
+@model List<ApplicationUser>
+
+<h2>All Registered Instructors</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>ID</th>
+                <th>Address</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var instructor in Model)
+            {
+                    <tr>
+                        <td>@instructor.FullName</td>
+                        <td>@instructor.Email</td>
+                        <td>
+                        @if (string.IsNullOrEmpty(instructor.PhoneNumber))
+                        {
+                                    <span class="text-muted">No phone number</span>
+                        }
+                        else
+                        {
+                            @instructor.PhoneNumber
+                        }
+                        </td>
+                        <td>@instructor.IDNumber</td>
+                        <td>@instructor.Address</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPhoneModal-@instructor.Id">
+                                📞 Edit Phone
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Edit Phone Modal -->
+                    <div class="modal fade" id="editPhoneModal-@instructor.Id" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Edit Phone Number for @instructor.FullName</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="post" asp-action="UpdateInstructorPhone">
+                                    <div class="modal-body">
+                                        <input type="hidden" name="instructorId" value="@instructor.Id" />
+                                        <div class="form-group">
+                                            <label>Phone Number:</label>
+                                            <input type="text" class="form-control" name="phoneNumber" 
+                                                   value="@instructor.PhoneNumber" 
+                                                   placeholder="e.g., +27 12 345 6789" required />
+                                            <small class="form-text text-muted">Format: +27 XXX XXX XXXX</small>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Update Phone</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+            }
+        </tbody>
+    </table>
+</div>

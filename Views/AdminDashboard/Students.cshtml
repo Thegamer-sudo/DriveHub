@@ -1,0 +1,106 @@
+﻿@model List<DriveHub.ViewModels.StudentDetailViewModel>
+@{
+    ViewData["Title"] = "Manage Students";
+}
+
+<h1>Student Management</h1>
+<p class="lead">View and manage all registered students</p>
+
+<!-- Success/Error Messages -->
+@if (TempData["SuccessMessage"] != null)
+{
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@if (TempData["InfoMessage"] != null)
+{
+        <div class="alert alert-info">@TempData["InfoMessage"]</div>
+}
+
+@if (Model.Any())
+{
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>ID Number</th>
+                        <th>Address</th>
+                        <th>Packages</th>
+                        <th>Payments</th>
+                        <th>Total Spent</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var studentDetail in Model)
+                {
+                    var totalSpent = studentDetail.Receipts.Sum(r => r.Amount);
+                    var hasPayments = studentDetail.Receipts.Any();
+                            <tr>
+                                <td>@studentDetail.Student.FullName</td>
+                                <td>@studentDetail.Student.Email</td>
+                                <td>@studentDetail.Student.PhoneNumber</td>
+                                <td>@studentDetail.Student.IDNumber</td>
+                                <td>@studentDetail.Student.Address</td>
+                                <td>
+                            @foreach (var package in studentDetail.Packages)
+                            {
+                                            <span class="badge bg-primary">@package.Type</span>
+                            }
+                                </td>
+                                <td>
+                            @foreach (var receipt in studentDetail.Receipts)
+                            {
+                                            <span class="badge bg-success">@receipt.ReceiptNumber</span>
+                            }
+                                </td>
+                                <td><strong>R@(totalSpent)</strong></td>
+                                <td>
+                            @if (hasPayments)
+                            {
+                                            <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                            <span class="badge bg-warning">Unpaid</span>
+                            }
+                                </td>
+                                <td>
+                                    <form method="post" asp-action="DeleteStudent" onsubmit="return confirm('⚠️ Are you sure you want to archive @studentDetail.Student.FullName?');" style="display: inline;">
+                                        <input type="hidden" name="studentId" value="@studentDetail.Student.Id" />
+                                        <button type="submit" class="btn btn-outline-secondary btn-sm" title="Archive student">
+                                            📁 Archive
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+}
+else
+{
+        <div class="alert alert-info">
+            <h4>No Students Found</h4>
+            <p>No students have registered yet.</p>
+        </div>
+}
+
+<a href="@Url.Action("Index")" class="btn btn-secondary">Back to Dashboard</a>
+
+@section Scripts {
+        <script>
+            // Auto-hide alerts after 5 seconds
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        </script>
+}

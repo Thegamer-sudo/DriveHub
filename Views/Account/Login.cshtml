@@ -1,0 +1,52 @@
+﻿@model DriveHub.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h1>Login to DriveHub</h1>
+
+<form asp-action="Login" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="Role">Login As</label>
+        <select asp-for="Role" class="form-control" required>
+            <option value="">Select Role ↓</option>
+            <option value="Student">Learner</option>
+            <option value="Instructor">Instructor</option>
+            <option value="Admin">Admin</option>
+        </select>
+        <span asp-validation-for="Role" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <div class="checkbox">
+            <label asp-for="RememberMe">
+                <input asp-for="RememberMe" />
+                @Html.DisplayNameFor(m => m.RememberMe)
+            </label>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+
+<p>
+    <a asp-action="Register">Register as a new Learner</a>
+</p>
+<p>
+    <a asp-action="ForgotPassword">Forgot your password?</a>
+</p>

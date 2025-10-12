@@ -1,0 +1,107 @@
+﻿@model List<DriveHub.ViewModels.StudentDetailViewModel>
+@{
+    ViewData["Title"] = "Manage Student-Instructor Assignments";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">@ViewData["Title"]</h1>
+    </div>
+
+    <!-- Success/Error Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+    }
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Student Assignments</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Student Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Assigned Instructor</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                                <tr>
+                                                    <td>@item.Student.FullName</td>
+                                                    <td>@item.Student.Email</td>
+                                                    <td>@item.Student.PhoneNumber</td>
+                                                    <td>@item.AssignedInstructorName</td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <!-- Simple Assign Form - No Modal -->
+                                                            <form asp-action="AssignInstructor" method="post" class="d-inline">
+                                                                <input type="hidden" name="studentId" value="@item.Student.Id" />
+                                                                <div class="input-group">
+                                                                    <select class="form-control form-control-sm" name="instructorId" required style="width: 200px;">
+                                                                        <option value="">-- Select Instructor --</option>
+                                                                @foreach (var instructor in ViewBag.Instructors)
+                                                                {
+                                                                                <option value="@instructor.Id">@instructor.FullName</option>
+                                                                }
+                                                                    </select>
+                                                                    <div class="input-group-append">
+                                                                        <button type="submit" class="btn btn-primary btn-sm">
+                                                                    @(item.AssignedInstructor != null ? "Reassign" : "Assign")
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+
+                                                    @if (item.AssignedInstructor != null)
+                                                    {
+                                                                    <!-- Remove Assignment Button -->
+                                                                    <form asp-action="RemoveAssignment" method="post" class="d-inline ml-1">
+                                                                        <input type="hidden" name="studentId" value="@item.Student.Id" />
+                                                                        <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Are you sure you want to remove this assignment?')">
+                                                                            Remove
+                                                                        </button>
+                                                                    </form>
+                                                    }
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                    }
+                                    </tbody>
+                                </table>
+                            </div>
+                    }
+                    else
+                    {
+                            <div class="alert alert-info">No students found.</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

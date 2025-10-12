@@ -1,0 +1,124 @@
+﻿@{
+    ViewData["Title"] = "Book Vehicle for Driving Test";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Book Vehicle for Driving Test</h1>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h5 class="m-0 font-weight-bold text-primary">Vehicle Booking Form</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-action="BookVehicle">
+                        <div class="form-group">
+                            <label for="testDate"><strong>Test Date *</strong></label>
+                            <input type="date" class="form-control" id="testDate" name="testDate" 
+                                   min="@DateTime.Now.AddDays(2).ToString("yyyy-MM-dd")" 
+                                   max="@DateTime.Now.AddMonths(3).ToString("yyyy-MM-dd")" required>
+                            <small class="form-text text-muted">Book at least 2 days in advance</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="testLocation"><strong>Test Location *</strong></label>
+                            <select class="form-control" id="testLocation" name="testLocation" required>
+                                <option value="">-- Select Test Location --</option>
+                                <option value="Johannesburg Licensing Department">Johannesburg Licensing Department</option>
+                                <option value="Pretoria Testing Centre">Pretoria Testing Centre</option>
+                                <option value="Durban Vehicle Testing">Durban Vehicle Testing</option>
+                                <option value="Cape Town Driving Test Centre">Cape Town Driving Test Centre</option>
+                                <option value="Port Elizabeth Testing">Port Elizabeth Testing</option>
+                                <option value="Bloemfontein Licensing">Bloemfontein Licensing</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="vehicleType"><strong>Vehicle Type *</strong></label>
+                            <select class="form-control" id="vehicleType" name="vehicleType" required>
+                                <option value="">-- Select Vehicle Type --</option>
+                                <option value="Car - Manual">Car - Manual Transmission</option>
+                                <option value="Car - Automatic">Car - Automatic Transmission</option>
+                                <option value="Light Truck">Light Truck</option>
+                                <option value="Motorcycle">Motorcycle</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="specialRequirements"><strong>Special Requirements</strong></label>
+                            <textarea class="form-control" id="specialRequirements" name="specialRequirements" 
+                                      rows="3" placeholder="Any special requirements or notes..."></textarea>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h6>💰 Booking Fee: R250.00</h6>
+                            <p class="mb-0">This fee covers vehicle preparation and instructor assistance for your test.</p>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg btn-block">
+                            🚗 Submit Booking Request
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-success text-white">
+                    <h5 class="m-0 font-weight-bold">📋 Booking Requirements</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">✅ Must be 'Driver Ready' status</li>
+                        <li class="list-group-item">✅ Must have Drivers or Full package</li>
+                        <li class="list-group-item">✅ Must be 18 years or older</li>
+                        <li class="list-group-item">✅ Book at least 2 days in advance</li>
+                        <li class="list-group-item">✅ Valid learner's license required</li>
+                        <li class="list-group-item">✅ Bring ID document on test day</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow mt-4">
+                <div class="card-header py-3 bg-primary text-white">
+                    <h5 class="m-0 font-weight-bold">ℹ️ What's Included</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">🚗 Test-ready vehicle</li>
+                        <li class="list-group-item">👨‍🏫 Instructor assistance</li>
+                        <li class="list-group-item">⛽ Fuel for test</li>
+                        <li class="list-group-item">📄 Documentation support</li>
+                        <li class="list-group-item">📞 Test day coordination</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+        <script>
+            // Set minimum date to 2 days from now
+            document.addEventListener('DOMContentLoaded', function() {
+                var today = new Date();
+                var minDate = new Date();
+                minDate.setDate(today.getDate() + 2);
+                document.getElementById('testDate').min = minDate.toISOString().split('T')[0];
+            });
+        </script>
+}

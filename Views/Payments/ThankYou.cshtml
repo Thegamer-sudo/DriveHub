@@ -1,0 +1,11 @@
+﻿@model DriveHub.Models.Receipt
+
+@{
+    ViewData["Title"] = "Thank You";
+}
+
+<h1>Thank You for Your Payment!</h1>
+<p>Receipt Number: @Model.ReceiptNumber</p>
+<p>Amount: R@Model.Amount</p>
+<p>An email has been sent to your registered address.</p>
+<a asp-controller="Account" asp-action="Login">Login to Dashboard</a>

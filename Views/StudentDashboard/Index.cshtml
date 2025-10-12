@@ -1,0 +1,444 @@
+﻿@using DriveHub.ViewModels
+@using DriveHub.Models
+@using Microsoft.AspNetCore.Identity
+@using DriveHub.Data
+@using DriveHub.Services
+@inject UserManager<ApplicationUser> UserManager
+@inject ApplicationDbContext DbContext
+@{
+    ViewData["Title"] = "Student Dashboard";
+    var studentName = ViewBag.StudentName as string;
+    var packageStatuses = ViewBag.PackageStatuses as List<PackageStatusViewModel> ?? new List<PackageStatusViewModel>();
+    var receipts = ViewBag.Receipts as List<Receipt> ?? new List<Receipt>();
+    var instructor = ViewBag.AssignedInstructor as ApplicationUser;
+    var drivingTips = ViewBag.DrivingTips as List<string> ?? new List<string>();
+
+    // Get current student for eligibility check
+    var student = await UserManager.GetUserAsync(User);
+    var isEligibleForVehicle = false;
+    var eligibilityMessage = "Complete lessons to book vehicle";
+
+    // NEW: Check if student can upgrade to Drivers
+    var canUpgradeToDrivers = ViewBag.CanUpgradeToDrivers ?? false;
+    var completedLearnersPackage = ViewBag.CompletedLearnersPackage as Package;
+
+    if (student != null)
+    {
+        var packages = DbContext.Packages.Where(p => p.UserId == student.Id).ToList();
+        var driverReadyPackage = packages.FirstOrDefault(p => p.IsDriverReady);
+
+        if (driverReadyPackage != null && !driverReadyPackage.Type.ToLower().Contains("learners"))
+        {
+            try
+            {
+                // UPDATED: Use ID Number for age calculation instead of DateOfBirth
+                isEligibleForVehicle = IdNumberHelper.Is18OrOver(student.IDNumber);
+
+                if (!isEligibleForVehicle)
+                {
+                    eligibilityMessage = "Must be 18+ to book vehicle";
+                }
+                else
+                {
+                    eligibilityMessage = "Eligible to book vehicle";
+                }
+            }
+            catch (Exception)
+            {
+                eligibilityMessage = "Invalid ID number format";
+                isEligibleForVehicle = false;
+            }
+        }
+        else if (driverReadyPackage != null)
+        {
+            eligibilityMessage = "Upgrade to Drivers package";
+        }
+    }
+}
+
+<h1>Welcome, @studentName! 🚗</h1>
+<p class="lead">Your Driving Learning Dashboard</p>
+
+@if (ViewBag.PaymentSuccess != null)
+{
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>🎉 Success!</strong> @ViewBag.PaymentSuccess
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+}
+
+@if (TempData["FeedbackMessage"] != null)
+{
+            <div class="alert alert-info">@TempData["FeedbackMessage"]</div>
+}
+
+<div class="row mt-4">
+    <!-- Left Column - Profile & Progress -->
+    <div class="col-md-8">
+        <!-- Package Information -->
+        <div class="card">
+            <div class="card-header">
+                <h5>Your Learning Package</h5>
+            </div>
+            <div class="card-body">
+                @if (packageStatuses.Any())
+                {
+                    foreach (var packageStatus in packageStatuses)
+                    {
+                        var package = packageStatus.Package;
+                        var hasPaid = packageStatus.HasPaid;
+
+                                        <div class="alert @(hasPaid ? "alert-success" : "alert-warning")">
+                                            <h6>@package.DisplayName</h6>
+                                            <p><strong>Package Price:</strong> R@(package.Price)</p>
+                                            <p><strong>Status:</strong> 
+                                @if (hasPaid)
+                                {
+                                                            <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                                            <span class="badge bg-warning">Payment Required</span>
+                                }
+                                            </p>
+
+                            @if (hasPaid)
+                            {
+                                            <!-- PHASED PROGRESS SYSTEM -->
+                                @if (package.Type.ToLower().Contains("full"))
+                                {
+                                                    <!-- FULL PACKAGE - SHOW PHASED PROGRESS -->
+                                    var learnersCompleted = package.LessonsCompleted >= 20;
+                                    var learnersProgress = package.LessonsCompleted > 20 ? 20 : package.LessonsCompleted;
+                                    var driversProgress = package.LessonsCompleted > 20 ? package.LessonsCompleted - 20 : 0;
+
+                                                    <!-- LEARNERS PHASE -->
+                                                    <div class="phase-section mb-4">
+                                                        <h6 class="text-primary">🎓 LEARNERS PHASE</h6>
+                                                        <p><strong>Total Lessons:</strong> 20 lessons</p>
+                                                        <div class="progress mt-2" style="height: 25px;">
+                                                            <div class="progress-bar @(learnersCompleted ? "bg-success" : "bg-primary")" 
+                                                                 role="progressbar" style="width: @((learnersProgress * 100) / 20)%;" 
+                                                                 aria-valuenow="@learnersProgress" aria-valuemin="0" aria-valuemax="20">
+                                                @learnersProgress/20 lessons
+                                                @if (learnersCompleted)
+                                                {
+                                                    <text> - COMPLETED!</text>
+                                                }
+                                                            </div>
+                                                        </div>
+                                        @if (learnersCompleted)
+                                        {
+                                                                <div class="alert alert-info mt-2 mb-0">
+                                                                    <small>✅ Learners phase complete! Ready for Drivers phase.</small>
+                                                                </div>
+                                        }
+                                        else
+                                        {
+                                                                <div class="mt-2">
+                                                                    <small class="text-muted">Complete Learners phase to unlock Drivers lessons.</small>
+                                                                </div>
+                                        }
+                                                    </div>
+
+                                                    <!-- DRIVERS PHASE -->
+                                                    <div class="phase-section @(!learnersCompleted ? "phase-locked" : "")">
+                                                        <h6 class="@(learnersCompleted ? "text-success" : "text-muted")">
+                                                            🚗 DRIVERS PHASE 
+                                            @if (!learnersCompleted)
+                                            {
+                                                                    <span class="badge bg-secondary">Locked</span>
+                                            }
+                                                        </h6>
+                                                        <p><strong>Total Lessons:</strong> 30 lessons</p>
+                                        @if (learnersCompleted)
+                                        {
+                                                                <div class="progress mt-2" style="height: 25px;">
+                                                                    <div class="progress-bar @(packageStatus.IsDriverReady ? "bg-success" : "bg-info")" 
+                                                                         role="progressbar" style="width: @((driversProgress * 100) / 30)%;" 
+                                                                         aria-valuenow="@driversProgress" aria-valuemin="0" aria-valuemax="30">
+                                                    @driversProgress/30 lessons
+                                                    @if (packageStatus.IsDriverReady)
+                                                    {
+                                                        <text> - COMPLETED!</text>
+                                                    }
+                                                                    </div>
+                                                                </div>
+                                            @if (!packageStatus.IsDriverReady)
+                                            {
+                                                                        <div class="mt-2">
+                                                                            <small class="text-muted">Continue with your driving lessons.</small>
+                                                                        </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                                                <div class="progress mt-2" style="height: 25px; background-color: #e9ecef;">
+                                                                    <div class="progress-bar bg-secondary" role="progressbar" style="width: 0%;">
+                                                                        0/30 lessons
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mt-2">
+                                                                    <small class="text-muted">🔒 Complete Learners phase to unlock Drivers lessons</small>
+                                                                </div>
+                                        }
+                                                    </div>
+                                }
+                                else
+                                {
+                                                    <!-- SINGLE PACKAGE - ORIGINAL DISPLAY -->
+                                                    <p><strong>Total Lessons:</strong> @package.LessonCount</p>
+                                                    <div class="progress mt-2" style="height: 25px;">
+                                                        <div class="progress-bar @(packageStatus.IsDriverReady ? "bg-success" : "bg-primary")" 
+                                                             role="progressbar" style="width: @packageStatus.ProgressPercentage%;" 
+                                                             aria-valuenow="@packageStatus.Package.LessonsCompleted" 
+                                                             aria-valuemin="0" aria-valuemax="@packageStatus.Package.LessonCount">
+                                            @packageStatus.Package.LessonsCompleted/@packageStatus.Package.LessonCount lessons
+                                            @if (packageStatus.IsDriverReady)
+                                            {
+                                                <text> - COMPLETED!</text>
+                                            }
+                                                        </div>
+                                                    </div>
+
+                                    @if (packageStatus.IsDriverReady)
+                                    {
+                                                            <div class="alert alert-success mt-3 mb-3">
+                                                                <h5 class="mb-1">🎓 LESSONS COMPLETE!</h5>
+                                                                <p class="mb-0">Congratulations! You've completed all your lessons.</p>
+                                                            </div>
+                                    }
+                                    else
+                                    {
+                                                            <div class="mt-2">
+                                                                <small class="text-muted">Continue with your lessons. Your instructor will update your progress.</small>
+                                                            </div>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                                        <div class="mt-3">
+                                                            <p class="text-danger"><strong>Complete your payment to start learning!</strong></p>
+                                                            <a href="@Url.Action("Payment", "Payments", new { packageId = package.Id })" 
+                                                               class="btn btn-primary btn-sm">
+                                                                💳 Complete Payment - R@(package.Price)
+                                                            </a>
+                                                        </div>
+                            }
+                                        </div>
+                    }
+                }
+                else
+                {
+                            <div class="alert alert-info">
+                                <h6>No Package Selected</h6>
+                                <p>You haven't selected a learning package yet.</p>
+                                <a href="@Url.Action("ChoosePackage", "Packages")" class="btn btn-primary btn-sm">
+                                    Choose a Package
+                                </a>
+                            </div>
+                }
+            </div>
+        </div>
+
+        <!-- NEW: UPGRADE TO DRIVERS SECTION -->
+        @if (canUpgradeToDrivers)
+        {
+                <div class="card border-info mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">🚗 Continue Your Driving Journey</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h5>✅ Learners Phase Complete!</h5>
+                            <p class="mb-3">Congratulations! You've successfully completed your Learners lessons. Ready to continue with Drivers training?</p>
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <p><strong>Upgrade to Drivers Package and get:</strong></p>
+                                    <ul>
+                                        <li>✅ 30 advanced driving lessons</li>
+                                        <li>✅ Vehicle handling techniques</li>
+                                        <li>✅ Highway and road driving</li>
+                                        <li>✅ Preparation for driver's license test</li>
+                                        <li>✅ Eligibility to book test vehicles</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <a href="@Url.Action("ChoosePackage", "Packages", new { upgrade = true })" 
+                                       class="btn btn-success btn-lg">
+                                        🚗 Upgrade to Drivers
+                                    </a>
+                                    <p class="text-muted mt-2"><small>Continue your journey</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        }
+
+        <!-- VEHICLE BOOKING SECTION - SEPARATE CARD -->
+        @if (packageStatuses.Any(ps => ps.IsDriverReady))
+        {
+                    <div class="card border-success mt-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">🚗 Book Your Driving Test Vehicle</h5>
+                        </div>
+                        <div class="card-body">
+                    @if (isEligibleForVehicle)
+                    {
+                                        <p class="mb-3">You're eligible to book a vehicle for your official driving test at the licensing department.</p>
+                                        <a href="@Url.Action("BookVehicle", "StudentDashboard")" class="btn btn-success btn-lg w-100 mb-2">
+                                            🚗 Book Vehicle for Driving Test
+                                        </a>
+                                        <a href="@Url.Action("MyBookings", "StudentDashboard")" class="btn btn-outline-info btn-sm w-100">
+                                            📋 View My Bookings
+                                        </a>
+                    }
+                    else
+                    {
+                                        <p class="text-danger mb-3"><strong>@eligibilityMessage</strong></p>
+                                        <button class="btn btn-secondary w-100 mb-2" disabled>
+                                            🚗 Book Vehicle for Driving Test
+                                        </button>
+                                        <a href="@Url.Action("MyBookings", "StudentDashboard")" class="btn btn-outline-secondary btn-sm w-100">
+                                            📋 View My Bookings
+                                        </a>
+                    }
+                        </div>
+                    </div>
+        }
+
+        <!-- Instructor Information -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Your Instructor</h5>
+            </div>
+            <div class="card-body">
+                @if (instructor != null)
+                {
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6>@instructor.FullName</h6>
+                                    <p class="mb-1"><strong>Email:</strong> @instructor.Email</p>
+                                    <p class="mb-1"><strong>Phone:</strong> @instructor.PhoneNumber</p>
+                                    <small class="text-muted">Your assigned driving instructor</small>
+                                </div>
+                                <button class="btn btn-outline-primary">Contact Instructor</button>
+                            </div>
+                }
+                else
+                {
+                            <p class="text-muted">You haven't been assigned an instructor yet. You'll be assigned one soon.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Payment History -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Payment History</h5>
+            </div>
+            <div class="card-body">
+                @if (receipts.Any())
+                {
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Receipt #</th>
+                                            <th>Package</th>
+                                            <th>Amount</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                @foreach (var receipt in receipts)
+                                {
+                                                    <tr>
+                                                        <td>@receipt.ReceiptNumber</td>
+                                                        <td>@receipt.Package.Type</td>
+                                                        <td>R@(receipt.Amount)</td>
+                                                        <td>@receipt.PaymentDate.ToString("dd MMM yyyy")</td>
+                                                        <td><span class="badge bg-success">Paid</span></td>
+                                                    </tr>
+                                }
+                                    </tbody>
+                                </table>
+                            </div>
+                }
+                else
+                {
+                            <p class="text-muted">No payment history found.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column - Tips & Actions -->
+    <div class="col-md-4">
+        <!-- Driving Tips Ticker -->
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5>💡 Did You Know?</h5>
+            </div>
+            <div class="card-body">
+                <div id="drivingTipsCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        @for (int i = 0; i < drivingTips.Count; i++)
+                        {
+                                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                                        <p class="text-center">@drivingTips[i]</p>
+                                    </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Feedback Form -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Send Feedback</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" asp-action="SubmitFeedback">
+                    <div class="mb-3">
+                        <textarea class="form-control" name="feedbackText" rows="3" 
+                                  placeholder="Have questions or feedback? Let us know..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Send Feedback</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .phase-section {
+        border-left: 4px solid #0d6efd;
+        padding-left: 15px;
+        margin-bottom: 20px;
+    }
+
+    .phase-locked {
+        opacity: 0.7;
+    }
+
+    .phase-locked .progress {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<!-- Bootstrap JS for carousel -->
+@section Scripts {
+            <script>
+                // Auto-rotate the driving tips
+                document.addEventListener('DOMContentLoaded', function() {
+                    var carousel = new bootstrap.Carousel(document.getElementById('drivingTipsCarousel'), {
+                        interval: 5000 // Change tip every 5 seconds
+                    });
+                });
+            </script>
+}

@@ -1,0 +1,37 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using DriveHub.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+            <!-- User Greeting -->
+            <li class="nav-item">
+                <span class="nav-link text-dark">Hello, @User.Identity?.Name!</span>
+            </li>
+
+            <!-- Logout with Confirmation -->
+            <li class="nav-item">
+                <form class="form-inline" asp-controller="Account" asp-action="Logout" onsubmit="return confirmLogout()">
+                    <button type="submit" class="nav-link btn btn-link text-dark">🚪 Logout</button>
+                </form>
+            </li>
+    }
+    else
+    {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Register</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Login</a>
+            </li>
+    }
+</ul>
+
+<!-- Logout Confirmation Script -->
+<script>
+    function confirmLogout() {
+        return confirm('Are you sure you want to log out?');
+    }
+</script>

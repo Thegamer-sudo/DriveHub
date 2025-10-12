@@ -1,0 +1,181 @@
+﻿@{
+    ViewData["Title"] = "Payment Successful";
+    var receiptNumber = ViewBag.ReceiptNumber as string;
+    var packageType = ViewBag.PackageType as string;
+    var amount = ViewBag.Amount as decimal?;
+    var cardLast4 = ViewBag.CardLast4 as string;
+    var cardHolder = ViewBag.CardHolder as string;
+    var paymentDate = ViewBag.PaymentDate as DateTime? ?? DateTime.Now;
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <!-- Success Header -->
+            <div class="text-center mb-5">
+                <div class="success-icon mb-4">
+                    <div style="font-size: 80px; color: #28a745;">✅</div>
+                </div>
+                <h1 class="display-4 text-success fw-bold mb-3">Payment Successful! 🎉</h1>
+                <p class="lead text-muted">Thank you for your payment. You're now ready to start your driving journey!</p>
+            </div>
+
+            <!-- Receipt Card -->
+            <div class="card shadow-lg border-0 mb-5">
+                <div class="card-header bg-success text-white py-4">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="mb-0">Payment Confirmation</h4>
+                            <p class="mb-0 opacity-75">DriveHub Driving School</p>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge bg-light text-success fs-6">PAID</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Student & Package Info -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">STUDENT INFORMATION</h6>
+                            <p class="mb-1"><strong>Name:</strong> @User.Identity?.Name</p>
+                            <p class="mb-0"><strong>Date:</strong> @paymentDate.ToString("dd MMM yyyy")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">PACKAGE DETAILS</h6>
+                            <p class="mb-1"><strong>Package:</strong> @packageType</p>
+                            <p class="mb-0"><strong>Receipt #:</strong> @receiptNumber</p>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Payment Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">PAYMENT METHOD</h6>
+                            <p class="mb-1"><strong>Card Holder:</strong> @cardHolder</p>
+                            <p class="mb-0"><strong>Card Number:</strong> **** **** **** @cardLast4</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <h6 class="text-muted mb-2">AMOUNT PAID</h6>
+                            <h3 class="text-success mb-0">R@(amount?.ToString("N2"))</h3>
+                            <small class="text-muted">Including VAT</small>
+                        </div>
+                    </div>
+
+                    <!-- Payment Timeline -->
+                    <div class="alert alert-light border mt-4">
+                        <h6 class="mb-3">What happens next?</h6>
+                        <div class="row text-center">
+                            <div class="col-3">
+                                <div class="text-success mb-2">1</div>
+                                <small>Payment Received</small>
+                            </div>
+                            <div class="col-3">
+                                <div class="text-success mb-2">2</div>
+                                <small>Instructor Assigned</small>
+                            </div>
+                            <div class="col-3">
+                                <div class="text-muted mb-2">3</div>
+                                <small>Schedule Lessons</small>
+                            </div>
+                            <div class="col-3">
+                                <div class="text-muted mb-2">4</div>
+                                <small>Start Learning</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body text-center">
+                            <div class="mb-3">📧</div>
+                            <h6>Email Receipt</h6>
+                            <p class="small text-muted">A detailed receipt has been sent to your email address for your records.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body text-center">
+                            <div class="mb-3">👨‍🏫</div>
+                            <h6>Instructor Assignment</h6>
+                            <p class="small text-muted">You'll be assigned an instructor within 24 hours who will contact you to schedule your first lesson.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center mt-5">
+                <div class="d-grid gap-2 d-md-flex justify-content-center">
+                    <a href="@Url.Action("Index", "StudentDashboard")" class="btn btn-primary btn-lg px-5">
+                        🚗 Go to Your Dashboard
+                    </a>
+                    <a href="@Url.Action("ChoosePackage", "Packages")" class="btn btn-outline-secondary btn-lg px-5">
+                        📦 View Other Packages
+                    </a>
+                </div>
+
+                <!-- Support Info -->
+                <div class="mt-4">
+                    <small class="text-muted">
+                        Need assistance? 
+                        <a href="mailto:support@drivehub.com" class="text-decoration-none">Email support</a> 
+                        or call us at <strong>(031) 123-4567</strong>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .success-icon {
+        animation: bounce 1s ease-in-out;
+    }
+
+    @@keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-20px); }
+        60% { transform: translateY(-10px); }
+    }
+
+    .card {
+        border-radius: 15px;
+    }
+
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
+
+    .btn {
+        border-radius: 10px;
+        font-weight: 600;
+    }
+</style>
+
+@section Scripts {
+        <script>
+            // Add some interactive effects
+            document.addEventListener('DOMContentLoaded', function() {
+                // Print receipt functionality
+                const printButton = document.getElementById('printReceipt');
+                if (printButton) {
+                    printButton.addEventListener('click', function() {
+                        window.print();
+                    });
+                }
+
+                // Auto-redirect to dashboard after 30 seconds
+                setTimeout(function() {
+                    window.location.href = '@Url.Action("Index", "StudentDashboard")';
+                }, 30000);
+            });
+        </script>
+}
